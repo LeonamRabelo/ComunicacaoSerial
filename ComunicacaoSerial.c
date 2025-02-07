@@ -31,6 +31,7 @@
 #define LED_PIN_BLUE 12
 #define LED_PIN_GREEN 11
 
+ssd1306_t ssd; // Inicializa a estrutura do display
 static volatile uint32_t last_time = 0; // Armazena o tempo do último evento (em microssegundos)
 volatile uint numero = 0;//variavel para inicializar o numero com 0, vai ser alterada nas interrupções (volatile)
 
@@ -191,8 +192,6 @@ uint32_t current_time = to_us_since_boot(get_absolute_time());
         if(gpio == BOTAO_A){
             //Alterna o estado do LED
             gpio_put(LED_PIN_GREEN, !gpio_get(LED_PIN_GREEN));
-            //Fazer mostrar uma informacao no display
-
             //Verifica se o led está ativo ou nao e envia uma mensagem ao Serial Monitor
             gpio_get(LED_PIN_GREEN) ? printf("LED Verde Aceso\n") : printf("LED Verde Desligado\n");
         }
@@ -200,21 +199,25 @@ uint32_t current_time = to_us_since_boot(get_absolute_time());
         if(gpio == BOTAO_B){
             //Alterna o estado do LED
             gpio_put(LED_PIN_BLUE, !gpio_get(LED_PIN_BLUE));
-
-            //Fazer mostrar uma informacao no display
-
             //Verifica se o led está ativo ou nao e envia uma mensagem ao Serial Monitor
             gpio_get(LED_PIN_BLUE) ? printf("LED Azul Aceso\n") : printf("LED Azul Desligado\n");
 
         }
-
     }
+
+    ssd1306_fill(&ssd, false); //Limpa o display                    
+    //Imprime estado atual dos leds no display
+    gpio_get(LED_PIN_GREEN)?ssd1306_draw_string(&ssd, "LED VERDE ON", 10, 10) :
+                            ssd1306_draw_string(&ssd, "LED VERDE OFF", 10, 20);//Desenha um caracter
+    gpio_get(LED_PIN_BLUE)?ssd1306_draw_string(&ssd, "LED AZUL ON", 10, 30) :
+                            ssd1306_draw_string(&ssd, "LED AZUL OFF", 10, 30);//Desenha um caracter
+    ssd1306_send_data(&ssd); //Atualiza o display
 }
+
 
 int main(){
     inicializarGPIOs();
 
-    ssd1306_t ssd; // Inicializa a estrutura do display
     ssd1306_init(&ssd, WIDTH, HEIGHT, false, endereco, I2C_PORT); // Inicializa o display
     ssd1306_config(&ssd); // Configura o display
     ssd1306_send_data(&ssd); // Envia os dados para o display
@@ -224,9 +227,10 @@ int main(){
     //Configuração da interrupção com callback para os botoes A e B
     gpio_set_irq_enabled_with_callback(BOTAO_A, GPIO_IRQ_EDGE_FALL, true, &gpio_irq_handler);
     gpio_set_irq_enabled_with_callback(BOTAO_B, GPIO_IRQ_EDGE_FALL, true, &gpio_irq_handler);
-    
-    bool cor = true;
 
+    ssd1306_fill(&ssd, false); //Limpa o display
+    ssd1306_draw_string(&ssd, "OLA WEDSON", 20, 30); //Desenha um caracter
+    ssd1306_send_data(&ssd); //Atualiza o display
     while(true){
     //if(stdio_usb_connected()){
     // Verifica se há um caractere disponível na entrada serial
@@ -235,12 +239,10 @@ int main(){
     if (scanf("%c", &c)==1){
         printf("Caractere recebido: %c\n", c);
         //Exibe o caractere no display SSD1306
-        cor = !cor;
         //Atualiza o conteúdo do display com animações
-        ssd1306_fill(&ssd, !cor); // Limpa o display
-        ssd1306_rect(&ssd, 3, 3, 122, 58, cor, !cor); // Desenha um retângulo
-        ssd1306_draw_char(&ssd, c, 20, 30); // Desenha uma string
-        ssd1306_send_data(&ssd); // Atualiza o display
+        ssd1306_fill(&ssd, false); //Limpa o display
+        ssd1306_draw_char(&ssd, c, 20, 30); //Desenha um caracter
+        ssd1306_send_data(&ssd); //Atualiza o display
 
         //Se for um número de 0 a 9, exibir na matriz de LEDs
         if (c >= '0' && c <= '9') {

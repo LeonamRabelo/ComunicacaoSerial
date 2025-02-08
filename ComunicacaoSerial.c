@@ -8,14 +8,6 @@
 #include "inc/ssd1306.h"
 #include "inc/font.h"
 
-// // UART defines
-// // By default the stdout UART is `uart0`, so we will use the second one
-// #define UART_ID uart1
-// #define BAUD_RATE 115200
-// // Use pins 4 and 5 for UART1
-// // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
-// #define UART_TX_PIN 4
-// #define UART_RX_PIN 5
 #define I2C_PORT i2c1
 #define I2C_SDA 14
 #define I2C_SCL 15
@@ -23,7 +15,7 @@
 
 #define IS_RGBW false
 #define NUM_PIXELS 25
-#define NUM_NUMBERS 10
+#define NUM_NUMBERS 11
 #define BOTAO_A 5
 #define BOTAO_B 6
 #define WS2812_PIN 7
@@ -128,6 +120,14 @@ bool led_numeros[NUM_NUMBERS][NUM_PIXELS] = {
     0, 1, 1, 1, 0,    
     0, 1, 0, 1, 0,  
     0, 1, 1, 1, 0   
+    },
+
+    //APAGAR OS LEDS, representado pelo número (posição) 10
+    {0, 0, 0, 0, 0,      
+    0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0,    
+    0, 0, 0, 0, 0,  
+    0, 0, 0, 0, 0   
     }
 };
 
@@ -208,7 +208,7 @@ uint32_t current_time = to_us_since_boot(get_absolute_time());
     ssd1306_fill(&ssd, false); //Limpa o display                    
     //Imprime estado atual dos leds no display
     gpio_get(LED_PIN_GREEN)?ssd1306_draw_string(&ssd, "LED VERDE ON", 10, 10) :
-                            ssd1306_draw_string(&ssd, "LED VERDE OFF", 10, 20);//Desenha um caracter
+                            ssd1306_draw_string(&ssd, "LED VERDE OFF", 10, 10);//Desenha um caracter
     gpio_get(LED_PIN_BLUE)?ssd1306_draw_string(&ssd, "LED AZUL ON", 10, 30) :
                             ssd1306_draw_string(&ssd, "LED AZUL OFF", 10, 30);//Desenha um caracter
     ssd1306_send_data(&ssd); //Atualiza o display
@@ -229,14 +229,17 @@ int main(){
     gpio_set_irq_enabled_with_callback(BOTAO_B, GPIO_IRQ_EDGE_FALL, true, &gpio_irq_handler);
 
     ssd1306_fill(&ssd, false); //Limpa o display
-    ssd1306_draw_string(&ssd, "OLA WEDSON", 20, 30); //Desenha um caracter
+    ssd1306_draw_string(&ssd, "BAHIA is World", 10, 30); //Desenha um caracter
     ssd1306_send_data(&ssd); //Atualiza o display
+
+    set_one_led(led_r, led_g, led_b, 10);   //Apagar matriz de led, não guardar valores da ultima vez acionado
+
     while(true){
-    //if(stdio_usb_connected()){
-    // Verifica se há um caractere disponível na entrada serial
+    if(stdio_usb_connected()){    //Verifica se há conexão no usb, se for simular no wokwi, retire essa linha
     char c; //Timeout de 1ms para evitar travamento
     //Se um caractere foi recebido
     if (scanf("%c", &c)==1){
+        set_one_led(led_r, led_g, led_b, 10);   //Apagar matriz de led caso nao seja passado um numero
         printf("Caractere recebido: %c\n", c);
         //Exibe o caractere no display SSD1306
         //Atualiza o conteúdo do display com animações
@@ -250,6 +253,6 @@ int main(){
             set_one_led(led_r, led_g, led_b, numero);
         }
     }
-    //}
+    }
     }
 }

@@ -207,10 +207,10 @@ uint32_t current_time = to_us_since_boot(get_absolute_time());
 
     ssd1306_fill(&ssd, false); //Limpa o display                    
     //Imprime estado atual dos leds no display
-    gpio_get(LED_PIN_GREEN)?ssd1306_draw_string(&ssd, "LED VERDE ON", 10, 10) :
-                            ssd1306_draw_string(&ssd, "LED VERDE OFF", 10, 10);//Desenha um caracter
-    gpio_get(LED_PIN_BLUE)?ssd1306_draw_string(&ssd, "LED AZUL ON", 10, 30) :
-                            ssd1306_draw_string(&ssd, "LED AZUL OFF", 10, 30);//Desenha um caracter
+    gpio_get(LED_PIN_GREEN)?ssd1306_draw_string(&ssd, "LED Verde ON", 10, 10) :
+                            ssd1306_draw_string(&ssd, "LED Verde OFF", 10, 10);//Desenha um caracter
+    gpio_get(LED_PIN_BLUE)?ssd1306_draw_string(&ssd, "LED Azul ON", 10, 30) :
+                            ssd1306_draw_string(&ssd, "LED Azul OFF", 10, 30);//Desenha um caracter
     ssd1306_send_data(&ssd); //Atualiza o display
 }
 

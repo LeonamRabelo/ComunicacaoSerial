@@ -1,5 +1,4 @@
 # COMUNICAÇÃO SERIAL UART E I2C
-# Temporizador de Um Disparo (One Shot)
 
 ## Descrição
 Este projeto utiliza a comunicação serial via **UART USB** para enviar caracteres ao display da placa **BitDogLab** usando protocolo **I2C**. Além disso, a matriz de LED **WS2812** é usada para representar números. 
@@ -46,7 +45,7 @@ Também foram implementados os botões **A** e **B**, com um sistema de **deboun
 Este projeto requer a biblioteca **pico-sdk**, que deve estar corretamente configurada no ambiente de desenvolvimento.
 
 ## Demonstração
-Assista ao vídeo demonstrativo da execução na BitDogLab e simulação no Wokwi:
+Assista ao vídeo demonstrativo da execução na BitDogLab:
 [![Link para o vídeo](https://img.youtube.com/vi/pq3OyeLgHHw/0.jpg)](https://youtu.be/pq3OyeLgHHw)
 
 ---
